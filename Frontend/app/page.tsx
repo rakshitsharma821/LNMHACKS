@@ -1,68 +1,86 @@
-import React from "react"
-import type { Metadata, Viewport } from 'next'
-import { Nunito } from 'next/font/google'
-import { Analytics } from '@vercel/analytics/next'
-import { ThemeProvider } from '@/components/theme-provider'
-import './globals.css'
+"use client"
 
-const nunito = Nunito({ 
-  subsets: ['latin'],
-  weight: ['400', '500', '600', '700', '800'],
-  variable: '--font-nunito',
-})
+import { useState } from "react"
+import { AnimatePresence, motion } from "framer-motion"
+import { LandingPage } from "@/components/landing-page"
+import { Onboarding } from "@/components/onboarding"
+import { AppShell } from "@/components/app-shell"
+import { DemoMode } from "@/components/demo-mode"
+import { motionTiming } from "@/lib/motion"
 
-export const metadata: Metadata = {
-  title: 'MindScoreAI - Track How You Feel',
-  description: 'Anonymous emotional check-ins turned into insight and rewards. Track your wellbeing, predict improvement, and earn rewards.',
-  generator: 'v0.app',
-  icons: {
-    icon: [
-      {
-        url: '/icon-light-32x32.png',
-        media: '(prefers-color-scheme: light)',
-      },
-      {
-        url: '/icon-dark-32x32.png',
-        media: '(prefers-color-scheme: dark)',
-      },
-      {
-        url: '/icon.svg',
-        type: 'image/svg+xml',
-      },
-    ],
-    apple: '/apple-icon.png',
-  },
-}
+type AppState = "landing" | "onboarding" | "app" | "demo"
 
-export const viewport: Viewport = {
-  themeColor: [
-    { media: '(prefers-color-scheme: light)', color: '#FFF6EC' },
-    { media: '(prefers-color-scheme: dark)', color: '#000000' },
-  ],
-  width: 'device-width',
-  initialScale: 1,
-  maximumScale: 1,
-  userScalable: false,
-}
+export default function Home() {
+  const [appState, setAppState] = useState<AppState>("landing")
 
-export default function RootLayout({
-  children,
-}: Readonly<{
-  children: React.ReactNode
-}>) {
+  const handleGetStarted = () => {
+    setAppState("onboarding")
+  }
+
+  const handleOnboardingComplete = () => {
+    setAppState("app")
+  }
+
+  const handleDemoExit = () => {
+    setAppState("app")
+  }
+
   return (
-    <html lang="en" suppressHydrationWarning>
-      <body className={`${nunito.className} font-sans antialiased`}>
-        <ThemeProvider
-          attribute="class"
-          defaultTheme="light"
-          enableSystem={false}
-          disableTransitionOnChange={false}
+    <AnimatePresence mode="wait">
+      {appState === "landing" && (
+        <motion.div
+          key="landing"
+          initial={{ opacity: 0 }}
+          animate={{ opacity: 1 }}
+          exit={{ opacity: 0 }}
+          transition={{ duration: motionTiming.transition }}
         >
-          {children}
-        </ThemeProvider>
-        <Analytics />
-      </body>
-    </html>
+          <LandingPage onGetStarted={handleGetStarted} />
+          {/* Demo Mode Entry */}
+          <button
+            onClick={() => setAppState("demo")}
+            className="fixed bottom-4 right-4 px-4 py-2 bg-card text-foreground rounded-full text-sm font-medium shadow-lg border border-border"
+          >
+            Investor Demo
+          </button>
+        </motion.div>
+      )}
+
+      {appState === "onboarding" && (
+        <motion.div
+          key="onboarding"
+          initial={{ opacity: 0 }}
+          animate={{ opacity: 1 }}
+          exit={{ opacity: 0 }}
+          transition={{ duration: motionTiming.transition }}
+        >
+          <Onboarding onComplete={handleOnboardingComplete} />
+        </motion.div>
+      )}
+
+      {appState === "app" && (
+        <motion.div
+          key="app"
+          initial={{ opacity: 0 }}
+          animate={{ opacity: 1 }}
+          exit={{ opacity: 0 }}
+          transition={{ duration: motionTiming.transition }}
+        >
+          <AppShell />
+        </motion.div>
+      )}
+
+      {appState === "demo" && (
+        <motion.div
+          key="demo"
+          initial={{ opacity: 0 }}
+          animate={{ opacity: 1 }}
+          exit={{ opacity: 0 }}
+          transition={{ duration: motionTiming.transition }}
+        >
+          <DemoMode onExit={handleDemoExit} />
+        </motion.div>
+      )}
+    </AnimatePresence>
   )
 }
