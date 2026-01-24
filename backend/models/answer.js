@@ -11,8 +11,7 @@ const AnswerSchema = new mongoose.Schema({
     ref: 'Question',
     required: true
   },
-  selectedOptionScore: { // Storing the score directly for easier calculation
-    type: Number,
+  selectedOptionScore: { 
     required: true,
     min: 1,
     max: 5

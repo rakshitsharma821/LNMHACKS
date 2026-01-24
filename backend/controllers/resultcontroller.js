@@ -1,11 +1,9 @@
-const Result = require('../backend/models/result');
+const Result = require('../models/result.js');
 
-// @desc    Get user's latest result
-// @route   GET /api/result/:userId
-// @access  Private (requires authentication)
+
 const getUserResult = async (req, res) => {
   try {
-    // Ensure the user requesting the result is the owner of the result
+   
     if (req.user._id.toString() !== req.params.userId) {
       return res.status(403).json({ message: 'Not authorized to view this result' });
     }

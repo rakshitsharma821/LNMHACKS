@@ -1,9 +1,9 @@
 const express = require('express');
 const dotenv = require('dotenv');
 const connectDB = require('./config/db');
-const authRoutes = require('./routes/authRoutes');
-const questionRoutes = require('./routes/questionRoutes');
-const resultRoutes = require('./routes/resultRoutes');
+const authRoutes = require('./routers/authRouters.js');
+const questionRoutes = require('./routers/questionRouters.js');
+const resultRoutes = require('./routers/resultRouters.js');
 
 dotenv.config();
 
@@ -11,13 +11,13 @@ connectDB();
 
 const app = express();
 
-app.use(express.json()); // Enable body parser for JSON
+app.use(express.json()); 
 
 app.get('/', (req, res) => {
   res.send('WhyFearAI Backend API is running...');
 });
 
-// Mount routes
+
 app.use('/api/auth', authRoutes);
 app.use('/api/questions', questionRoutes);
 app.use('/api/result', resultRoutes);

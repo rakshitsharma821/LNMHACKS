@@ -1,10 +1,7 @@
-const Question = require('../backend/models/question');
-const Answer = require('../backend/models/answer');
-const Result = require('../backend/models/result');
+const Question = require('../models/question');
+const Answer = require('../models/result');
+const Result = require('../models/result');
 
-// @desc    Get all questions
-// @route   GET /api/questions
-// @access  Private (requires authentication)
 const getQuestions = async (req, res) => {
   try {
     const questions = await Question.find({}).select('-createdAt');
@@ -14,11 +11,9 @@ const getQuestions = async (req, res) => {
   }
 };
 
-// @desc    Submit user answers to a questionnaire
-// @route   POST /api/submit-answers
-// @access  Private
+
 const submitAnswers = async (req, res) => {
-  const { answers } = req.body; // answers: [{ questionId: '...', selectedOptionScore: N }]
+  const { answers } = req.body; 
   const userId = req.user._id;
 
   if (!answers || !Array.isArray(answers) || answers.length === 0) {
@@ -31,7 +26,7 @@ const submitAnswers = async (req, res) => {
   for (const ans of answers) {
     const { questionId, selectedOptionScore } = ans;
 
-    // Validate score (assuming 1-5 as per requirements)
+
     if (selectedOptionScore < 1 || selectedOptionScore > 5) {
       return res.status(400).json({ message: `Invalid score for question ${questionId}. Scores must be between 1 and 5.` });
     }
@@ -45,28 +40,19 @@ const submitAnswers = async (req, res) => {
   }
 
   try {
-    // Save answers (optional, but good for tracking)
+   
     await Answer.insertMany(newAnswers);
 
     let riskCategory;
     let recommendations;
 
-    // Rule-based logic for risk assessment and recommendations
-    // Assuming a max score of 50 for 10 questions (5 max score per question)
-    // Adjust thresholds based on actual number of questions and desired risk levels
-    // Example: 10 questions * 5 points max = 50 total max score
-    // Let's assume 10 questions for the thresholds below
-    // Low Risk: 10-20
-    // Moderate Risk: 21-35
-    // High Risk: 36-50
+  
+    const NUMBER_OF_QUESTIONS = answers.length; 
+    const MAX_POSSIBLE_SCORE = NUMBER_OF_QUESTIONS * 5; 
 
-    // ************* HACKATHON RULE-BASED LOGIC ***************
-    const NUMBER_OF_QUESTIONS = answers.length; // Dynamically adjust based on submitted answers
-    const MAX_POSSIBLE_SCORE = NUMBER_OF_QUESTIONS * 5; // Max score per question is 5
-
-    // These thresholds are examples and should be tuned based on the actual questionnaire
-    const LOW_RISK_THRESHOLD = MAX_POSSIBLE_SCORE * 0.4;    // e.g., if 10 questions, 10 * 5 * 0.4 = 20
-    const MODERATE_RISK_THRESHOLD = MAX_POSSIBLE_SCORE * 0.7; // e.g., if 10 questions, 10 * 5 * 0.7 = 35
+    
+    const LOW_RISK_THRESHOLD = MAX_POSSIBLE_SCORE * 0.4;    
+    const MODERATE_RISK_THRESHOLD = MAX_POSSIBLE_SCORE * 0.7; 
 
     if (totalScore <= LOW_RISK_THRESHOLD) {
       riskCategory = 'Low Risk';
@@ -74,20 +60,18 @@ const submitAnswers = async (req, res) => {
     } else if (totalScore <= MODERATE_RISK_THRESHOLD) {
       riskCategory = 'Moderate Risk';
       recommendations = 'Explore resources such as mental health apps (e.g., Calm, Headspace), online support groups, and educational materials on stress management. Consider talking to a trusted friend or family member.';
-    } else { // totalScore > MODERATE_RISK_THRESHOLD
+    } else { 
       riskCategory = 'High Risk';
       recommendations = 'It is highly recommended to seek professional support. We suggest a 1-on-1 counseling referral. Please reach out to a mental health professional for personalized guidance and support.';
     }
-    // ********************************************************
-
-    // Update or create result for the user
+  
     const result = await Result.findOneAndUpdate(
       { user: userId },
       {
         totalScore,
         riskCategory,
         recommendations,
-        createdAt: Date.now() // Update timestamp for latest result
+        createdAt: Date.now() 
       },
       { upsert: true, new: true, setDefaultsOnInsert: true }
     );
@@ -104,12 +88,10 @@ const submitAnswers = async (req, res) => {
   }
 };
 
-// @desc    Initial seed for questions (Call this once manually or via a separate script)
-// @route   POST /api/questions/seed (for development only)
-// @access  Public (should be private in production)
+
 const seedQuestions = async (req, res) => {
   try {
-    await Question.deleteMany({}); // Clear existing questions
+    await Question.deleteMany({});
     const questionsData = [
       {
         text: "How often do you feel overwhelmed or stressed?",
@@ -225,5 +207,5 @@ const seedQuestions = async (req, res) => {
 module.exports = {
   getQuestions,
   submitAnswers,
-  seedQuestions // For hackathon setup
+  seedQuestions,
 };
