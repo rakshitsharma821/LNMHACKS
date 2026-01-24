@@ -1,6 +1,6 @@
 const express = require('express');
-const { getUserResult } = require('../../controllers/resultController');
-const protect = require('../middleware/auth');
+const { getUserResult } = require('../controllers/resultcontroller.js');
+const protect = require('../middleware/auth.js');
 const router = express.Router();
 
 router.get('/:userId', protect, getUserResult);

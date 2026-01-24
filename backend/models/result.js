@@ -5,7 +5,7 @@ const ResultSchema = new mongoose.Schema({
     type: mongoose.Schema.Types.ObjectId,
     ref: 'User',
     required: true,
-    unique: true // Each user only has one latest result
+    unique: true 
   },
   totalScore: {
     type: Number,
