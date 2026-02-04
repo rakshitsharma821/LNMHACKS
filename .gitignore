@@ -1,54 +1,26 @@
-# dependencies
-/node_modules
-/.pnp
-.pnp.js
-package-lock.json
-yarn.lock
-pnpm-lock.yaml
-
-# testing
-/coverage
-
-# next.js
-/.next/
-/out/
-.next/
-
-# production
-/build
-/dist
-
-# misc
-.DS_Store
-*.pem
-*.log
-
-# debug
-npm-debug.log*
-yarn-debug.log*
-yarn-error.log*
-lerna-debug.log*
-
-# local env files
-.env*.local
 .env
 .env.local
 .env.*.local
 
-# vercel
-.vercel
+node_modules/
+npm-debug.log
+yarn-error.log
 
-# IDE
-.vscode
-.idea
+
+.vscode/
+.idea/
 *.swp
 *.swo
 *~
-.DS_Store
 
 # OS
+.DS_Store
 Thumbs.db
 
-# typescript
-*.tsbuildinfo
-next-env.d.ts
+# Build outputs
+dist/
+build/
+*.tgz
+
+# Logs
+logs/
